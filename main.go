@@ -23,14 +23,22 @@ func main() {
 			fmt.Printf("Error getting ports: %v\n", err)
 		}
 
-		// fmt.Println(dokkuPorts)
-
 		fmt.Print("Will this project use postgres? (y/n): ")
 		use_pg, _ := reader.ReadString('\n')
 
 		fmt.Print("Which port will this project use? (already used ports: " + ports + "): ")
 		app_ports, _ := reader.ReadString('\n')
-		fmt.Println("Creating app " + name + " with ports " + app_ports + " and postgres " + use_pg)
+		fmt.Println("Creating app ", name, " with ports ", app_ports, " and postgres ", use_pg)
+
+		fmt.Print("Is this correct? (y/n): ")
+		correct, _ := reader.ReadString('\n')
+		if correct == "y\n" {
+			fmt.Println("Creating app ")
+		} else {
+			fmt.Println("Exiting...")
+			break
+		}
+
 		return
 
 		// if err != nil {
@@ -97,7 +105,6 @@ func getDokkuPortsUsed() (string, error) {
 		}
 	}
 
-	fmt.Println("PORTS: ", ports)
 	p := strings.Join(ports, ", ")
 	return p, nil
 }
