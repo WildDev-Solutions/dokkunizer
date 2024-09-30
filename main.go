@@ -14,8 +14,6 @@ func main() {
 	for {
 		fmt.Print("What is the name of the project: ")
 		name, _ := reader.ReadString('\n')
-
-		// Trim any extra spaces or newlines
 		name = strings.TrimSpace(name)
 
 		ports, err := getDokkuPortsUsed()
@@ -25,34 +23,91 @@ func main() {
 
 		fmt.Print("Will this project use postgres? (y/n): ")
 		use_pg, _ := reader.ReadString('\n')
+		use_pg = strings.TrimSpace(use_pg)
 
 		fmt.Print("Which port will this project use? (already used ports: " + ports + "): ")
-		app_ports, _ := reader.ReadString('\n')
+		app_port, _ := reader.ReadString('\n')
+		app_port = strings.TrimSpace(app_port)
 
-		fmt.Println("Creating app ", name, " with ports ", app_ports, " and postgres ", use_pg)
-		fmt.Println("Creating app ", name, " with pg ", use_pg, " and ports ", app_ports)
+		fmt.Print("What is the domain of the project: ")
+		domain, _ := reader.ReadString('\n')
+		domain = strings.TrimSpace(domain)
 
-		fmt.Println("Name has breakline: ", strings.Contains(name, "\n"), strings.Contains(name, "\r"))
-		fmt.Println("App ports has breakline: ", strings.Contains(app_ports, "\n"), strings.Contains(app_ports, "\r"))
-		fmt.Println("Use pg has breakline: ", strings.Contains(use_pg, "\n"), strings.Contains(use_pg, "\r"))
+		fmt.Println("Creating app ", name, " with ports ", app_port, " and postgres ", use_pg, " on domain ", domain)
 
 		fmt.Print("Is this correct? (y/n): ")
 		correct, _ := reader.ReadString('\n')
 		if correct == "y\n" {
 			fmt.Println("Creating app ")
+			createApp := exec.Command("dokku", "apps:create", name)
+			err := createApp.Run()
+			if err != nil {
+				fmt.Printf("Error creating app: %v\n", err)
+				break
+			}
+
+			if use_pg == "y" {
+				fmt.Println("Creating postgres")
+				createPostgres := exec.Command("dokku", "postgres:create", name)
+				err := createPostgres.Run()
+				if err != nil {
+					fmt.Printf("Error creating postgres: %v\n", err)
+					break
+				}
+
+				fmt.Println("Linking postgres")
+				linkPostgres := exec.Command("dokku", "postgres:link", name, name)
+				err = linkPostgres.Run()
+				if err != nil {
+					fmt.Printf("Error linking postgres: %v\n", err)
+					break
+				}
+			}
+
+			fmt.Println("Setting ports")
+			setPortsHttp := exec.Command("dokku", "ports:set", name, "http:80:", app_port)
+			err = setPortsHttp.Run()
+			if err != nil {
+				fmt.Printf("Error setting ports: %v\n", err)
+				break
+			}
+			setPortsHttps := exec.Command("dokku", "ports:set", name, "http:433:", app_port)
+			err = setPortsHttps.Run()
+			if err != nil {
+				fmt.Printf("Error setting ports: %v\n", err)
+				break
+			}
+
+			fmt.Println("Setting domain")
+			setDomain := exec.Command("dokku", "domains:add", name, domain)
+			err = setDomain.Run()
+			if err != nil {
+				fmt.Printf("Error setting domain: %v\n", err)
+				break
+			}
+
+			fmt.Println("Running letsencrypt")
+			letsencrypt := exec.Command("dokku", "letsencrypt:set", name, "email", "pedro.leoti.dev@gmail.com")
+			err = letsencrypt.Run()
+			if err != nil {
+				fmt.Printf("Error running letsencrypt: %v\n", err)
+				break
+			}
+			letsencryptEnable := exec.Command("dokku", "letsencrypt:enable", name)
+			err = letsencryptEnable.Run()
+			if err != nil {
+				fmt.Printf("Error running letsencrypt: %v\n", err)
+				break
+			}
+
+			fmt.Println("All done!")
+			break
+
 		} else {
 			fmt.Println("Exiting...")
 			break
 		}
 
-		return
-
-		// if err != nil {
-		// 	fmt.Printf("Error executing command: %s\n", err)
-		// }
-
-		// Print the output
-		// fmt.Println(string(output))
 	}
 }
 
@@ -114,16 +169,3 @@ func getDokkuPortsUsed() (string, error) {
 	p := strings.Join(ports, ", ")
 	return p, nil
 }
-
-// If the user types "exit", break the loop and quit
-// if input == "exit" {
-// 	fmt.Println("Exiting...")
-// 	break
-// }
-
-// // Split input into command and arguments
-// parts := strings.Split(name, " ")
-// cmd := exec.Command(parts[0], parts[1:]...)
-
-// Get the command output
-// output, err := cmd.CombinedOutput()
