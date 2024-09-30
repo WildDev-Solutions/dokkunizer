@@ -30,7 +30,11 @@ func main() {
 		app_ports, _ := reader.ReadString('\n')
 
 		fmt.Println("Creating app ", name, " with ports ", app_ports, " and postgres ", use_pg)
-		fmt.Println("Creating app ", name, " with pg ", use_pg, " and ports ", ports)
+		fmt.Println("Creating app ", name, " with pg ", use_pg, " and ports ", app_ports)
+
+		fmt.Println("Name has breakline: ", strings.Contains(name, "\n"), strings.Contains(name, "\r"))
+		fmt.Println("App ports has breakline: ", strings.Contains(app_ports, "\n"), strings.Contains(app_ports, "\r"))
+		fmt.Println("Use pg has breakline: ", strings.Contains(use_pg, "\n"), strings.Contains(use_pg, "\r"))
 
 		fmt.Print("Is this correct? (y/n): ")
 		correct, _ := reader.ReadString('\n')
