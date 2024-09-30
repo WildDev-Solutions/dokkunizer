@@ -80,7 +80,7 @@ func main() {
 			err = letsencrypt.Run()
 			fmt.Println(buffer.String())
 			if err != nil {
-				fmt.Printf("Error running letsencrypt: %v\n", err)
+				fmt.Printf("Error running letsencrypt set: %v\n", err)
 				break
 			}
 
@@ -89,7 +89,7 @@ func main() {
 			err = letsencryptEnable.Run()
 			fmt.Println(buffer.String())
 			if err != nil {
-				fmt.Printf("Error running letsencrypt: %v\n", err)
+				fmt.Printf("Error running letsencrypt enable: %v\n", err)
 				break
 			}
 
