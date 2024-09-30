@@ -12,7 +12,7 @@ func main() {
 	reader := bufio.NewReader(os.Stdin)
 
 	for {
-		fmt.Print("Give the name of the project: ")
+		fmt.Print("What is the name of the project: ")
 		name, _ := reader.ReadString('\n')
 
 		// Trim any extra spaces or newlines
@@ -68,7 +68,7 @@ func getDokkuPortsUsed() (string, error) {
 		proxyCmd := exec.Command("dokku", "ports:list", app)
 		proxyOutput, err := proxyCmd.Output()
 		if err != nil {
-			fmt.Printf("Error getting port mappings for app %s: %v\n", app, err)
+			// fmt.Printf("Error getting port mappings for app %s: %v\n", app, err)
 			continue
 		}
 
@@ -91,6 +91,8 @@ func getDokkuPortsUsed() (string, error) {
 			fmt.Printf("Error scanning output for app %s: %v\n", app, err)
 		}
 	}
+
+	fmt.Println("PORTS: ", ports)
 
 	p := strings.Join(ports, ",")
 	return p, nil
