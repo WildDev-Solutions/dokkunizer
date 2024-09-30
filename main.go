@@ -18,15 +18,20 @@ func main() {
 		// Trim any extra spaces or newlines
 		name = strings.TrimSpace(name)
 
-		getDokkuPortsUsed()
+		ports, err := getDokkuPortsUsed()
+		if err != nil {
+			fmt.Printf("Error getting ports: %v\n", err)
+		}
+
 		// fmt.Println(dokkuPorts)
 
+		fmt.Print("Will this project use postgres? (y/n): ")
+		use_pg, _ := reader.ReadString('\n')
 
-		// fmt.Print("Will this project use postgres? (y/n): ")
-		// use_pg, _ := reader.ReadString('\n')
-
-		// fmt.Print("Which port will this project use? ")
-		// app_ports, _ := reader.ReadString('\n')
+		fmt.Print("Which port will this project use? (already used ports: " + ports + "): ")
+		app_ports, _ := reader.ReadString('\n')
+		fmt.Println("Creating app " + name + " with ports " + app_ports, " and postgres " + use_pg)
+		return
 
 		// if err != nil {
 		// 	fmt.Printf("Error executing command: %s\n", err)
@@ -37,20 +42,20 @@ func main() {
 	}
 }
 
-func getDokkuPortsUsed() {
+func getDokkuPortsUsed() (string, error) {
 	// Run 'dokku apps:list' to get all apps
 	appsCmd := exec.Command("dokku", "apps:list")
 	appsOutput, err := appsCmd.Output()
 	if err != nil {
-		fmt.Printf("Error listing apps: %v\n", err)
-		return
+		// fmt.Printf("Error listing apps: %v\n", err)
+		return "", err
 	}
 
 	// Convert output to string and split into lines
 	apps := strings.Split(string(appsOutput), "\n")
 
-	// Initialize a variable to store port mappings
-	var portsMapping string
+	// Initialize a slice to store port numbers
+	var ports []string
 
 	// Iterate over each app, skipping the header
 	for _, app := range apps {
@@ -67,22 +72,28 @@ func getDokkuPortsUsed() {
 			continue
 		}
 
-		// Append the app name and port mappings to the portsMapping string
-		portsMapping += fmt.Sprintf("App: %s\n%s\n", app, string(proxyOutput))
+		// Scan through the output line by line
+		scanner := bufio.NewScanner(strings.NewReader(string(proxyOutput)))
+		for scanner.Scan() {
+			line := strings.TrimSpace(scanner.Text())
+			// Look for lines containing "container port"
+			if strings.Contains(line, "container port") {
+				// Split the line and grab the last part (port number)
+				parts := strings.Fields(line)
+				if len(parts) > 0 {
+					port := parts[len(parts)-1]
+					ports = append(ports, port)
+				}
+			}
+		}
+
+		if err := scanner.Err(); err != nil {
+			fmt.Printf("Error scanning output for app %s: %v\n", app, err)
+		}
 	}
 
-	// Print the final result with all port mappings
-	fmt.Println(portsMapping)
-	//
-	// ///
-	// cmd := exec.Command("dokku", "proxy:ports")
-	// output, err := cmd.CombinedOutput()
-	//
-	// if err != nil {
-	// 	fmt.Printf("Error executing command: %s\n", err)
-	// }
-	//
-	// fmt.Println(string(output))
+	p := strings.Join(ports, ",")
+	return p, nil
 }
 
 // If the user types "exit", break the loop and quit
