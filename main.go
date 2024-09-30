@@ -30,7 +30,7 @@ func main() {
 
 		fmt.Print("Which port will this project use? (already used ports: " + ports + "): ")
 		app_ports, _ := reader.ReadString('\n')
-		fmt.Println("Creating app " + name + " with ports " + app_ports, " and postgres " + use_pg)
+		fmt.Println("Creating app "+name+" with ports "+app_ports+" and postgres "+use_pg)
 		return
 
 		// if err != nil {
@@ -76,12 +76,12 @@ func getDokkuPortsUsed() (string, error) {
 		scanner := bufio.NewScanner(strings.NewReader(string(proxyOutput)))
 		for scanner.Scan() {
 			line := strings.TrimSpace(scanner.Text())
-			// Look for lines containing "container port"
-			if strings.Contains(line, "container port") {
-				// Split the line and grab the last part (port number)
+			// Look for lines containing "https" or "http" to get the port number
+			if strings.HasPrefix(line, "https") || strings.HasPrefix(line, "http") {
 				parts := strings.Fields(line)
-				if len(parts) > 0 {
-					port := parts[len(parts)-1]
+				if len(parts) >= 3 {
+					// Append the container port (last item in the line) to the ports slice
+					port := parts[2] // Container port is the 3rd element in the line
 					ports = append(ports, port)
 				}
 			}
