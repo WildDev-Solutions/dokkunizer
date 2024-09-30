@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"os"
 	"os/exec"
@@ -73,14 +74,20 @@ func main() {
 			}
 
 			fmt.Println("Running letsencrypt")
+			var buffer bytes.Buffer
 			letsencrypt := exec.Command("dokku", "letsencrypt:set", name, "email", "pedro.leoti.dev@gmail.com")
+			letsencrypt.Stdout = &buffer
 			err = letsencrypt.Run()
+			fmt.Println(buffer.String())
 			if err != nil {
 				fmt.Printf("Error running letsencrypt: %v\n", err)
 				break
 			}
+
 			letsencryptEnable := exec.Command("dokku", "letsencrypt:enable", name)
+			letsencryptEnable.Stdout = &buffer
 			err = letsencryptEnable.Run()
+			fmt.Println(buffer.String())
 			if err != nil {
 				fmt.Printf("Error running letsencrypt: %v\n", err)
 				break
