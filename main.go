@@ -66,7 +66,7 @@ func main() {
 			}
 
 			fmt.Println("Setting domain")
-			setDomain := exec.Command("dokku", "domains:add", name, domain)
+			setDomain := exec.Command("dokku", "domains:set", name, domain)
 			err = setDomain.Run()
 			if err != nil {
 				fmt.Printf("Error setting domain: %v\n", err)
@@ -100,7 +100,7 @@ func main() {
 				fmt.Printf("Error setting ports: %v\n", err)
 				break
 			}
-			setPortsHttps := exec.Command("dokku", "ports:set", name, "http:433:", app_port)
+			setPortsHttps := exec.Command("dokku", "ports:set", name, "https:433:", app_port)
 			err = setPortsHttps.Run()
 			if err != nil {
 				fmt.Printf("Error setting ports: %v\n", err)
