@@ -64,20 +64,6 @@ func main() {
 				}
 			}
 
-			fmt.Println("Setting ports")
-			setPortsHttp := exec.Command("dokku", "ports:set", name, "http:80:", app_port)
-			err = setPortsHttp.Run()
-			if err != nil {
-				fmt.Printf("Error setting ports: %v\n", err)
-				break
-			}
-			setPortsHttps := exec.Command("dokku", "ports:set", name, "http:433:", app_port)
-			err = setPortsHttps.Run()
-			if err != nil {
-				fmt.Printf("Error setting ports: %v\n", err)
-				break
-			}
-
 			fmt.Println("Setting domain")
 			setDomain := exec.Command("dokku", "domains:add", name, domain)
 			err = setDomain.Run()
@@ -97,6 +83,20 @@ func main() {
 			err = letsencryptEnable.Run()
 			if err != nil {
 				fmt.Printf("Error running letsencrypt: %v\n", err)
+				break
+			}
+
+			fmt.Println("Setting ports")
+			setPortsHttp := exec.Command("dokku", "ports:set", name, "http:80:", app_port)
+			err = setPortsHttp.Run()
+			if err != nil {
+				fmt.Printf("Error setting ports: %v\n", err)
+				break
+			}
+			setPortsHttps := exec.Command("dokku", "ports:set", name, "http:433:", app_port)
+			err = setPortsHttps.Run()
+			if err != nil {
+				fmt.Printf("Error setting ports: %v\n", err)
 				break
 			}
 
