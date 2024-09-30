@@ -28,7 +28,9 @@ func main() {
 
 		fmt.Print("Which port will this project use? (already used ports: " + ports + "): ")
 		app_ports, _ := reader.ReadString('\n')
+
 		fmt.Println("Creating app ", name, " with ports ", app_ports, " and postgres ", use_pg)
+		fmt.Println("Creating app ", name, " with pg ", use_pg, " and ports ", ports)
 
 		fmt.Print("Is this correct? (y/n): ")
 		correct, _ := reader.ReadString('\n')
