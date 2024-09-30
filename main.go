@@ -30,7 +30,7 @@ func main() {
 
 		fmt.Print("Which port will this project use? (already used ports: " + ports + "): ")
 		app_ports, _ := reader.ReadString('\n')
-		fmt.Println("Creating app "+name+" with ports "+app_ports+" and postgres "+use_pg)
+		fmt.Println("Creating app " + name + " with ports " + app_ports + " and postgres " + use_pg)
 		return
 
 		// if err != nil {
@@ -47,7 +47,7 @@ func getDokkuPortsUsed() (string, error) {
 	appsCmd := exec.Command("dokku", "apps:list")
 	appsOutput, err := appsCmd.Output()
 	if err != nil {
-		// fmt.Printf("Error listing apps: %v\n", err)
+		fmt.Printf("Error listing apps: %v\n", err)
 		return "", err
 	}
 
@@ -56,6 +56,7 @@ func getDokkuPortsUsed() (string, error) {
 
 	// Initialize a slice to store port numbers
 	var ports []string
+	portMap := make(map[string]bool) // To track unique ports
 
 	// Iterate over each app, skipping the header
 	for _, app := range apps {
@@ -80,9 +81,13 @@ func getDokkuPortsUsed() (string, error) {
 			if strings.HasPrefix(line, "https") || strings.HasPrefix(line, "http") {
 				parts := strings.Fields(line)
 				if len(parts) >= 3 {
-					// Append the container port (last item in the line) to the ports slice
-					port := parts[2] // Container port is the 3rd element in the line
-					ports = append(ports, port)
+					// Get the port number (last item in the line)
+					port := parts[2] // Host port is the 3rd element in the line
+					// Check if port is already in the map
+					if !portMap[port] {
+						ports = append(ports, port)
+						portMap[port] = true // Mark port as seen
+					}
 				}
 			}
 		}
@@ -93,8 +98,7 @@ func getDokkuPortsUsed() (string, error) {
 	}
 
 	fmt.Println("PORTS: ", ports)
-
-	p := strings.Join(ports, ",")
+	p := strings.Join(ports, ", ")
 	return p, nil
 }
 
