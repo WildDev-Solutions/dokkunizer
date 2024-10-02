@@ -95,15 +95,19 @@ func main() {
 
 			fmt.Println("Setting ports")
 			setPortsHttp := exec.Command("dokku", "ports:set", name, "http:80:", app_port)
+			setPortsHttp .Stdout = &buffer
 			err = setPortsHttp.Run()
+			fmt.Println(buffer.String())
 			if err != nil {
-				fmt.Printf("Error setting ports: %v\n", err)
+				fmt.Printf("Error setting ports http: %v\n", err)
 				break
 			}
 			setPortsHttps := exec.Command("dokku", "ports:set", name, "https:433:", app_port)
+			setPortsHttps.Stdout = &buffer
 			err = setPortsHttps.Run()
+			fmt.Println(buffer.String())
 			if err != nil {
-				fmt.Printf("Error setting ports: %v\n", err)
+				fmt.Printf("Error setting ports https: %v\n", err)
 				break
 			}
 
