@@ -17,24 +17,25 @@ func main() {
 		name, _ := reader.ReadString('\n')
 		name = strings.TrimSpace(name)
 
-		ports, err := getDokkuPortsUsed()
-		if err != nil {
-			fmt.Printf("Error getting ports: %v\n", err)
-		}
+		// ports, err := getDokkuPortsUsed()
+		// if err != nil {
+		// 	fmt.Printf("Error getting ports: %v\n", err)
+		// }
 
 		fmt.Print("Will this project use postgres? (y/n): ")
 		use_pg, _ := reader.ReadString('\n')
 		use_pg = strings.TrimSpace(use_pg)
 
-		fmt.Print("Which port will this project use? (already used ports: " + ports + "): ")
-		app_port, _ := reader.ReadString('\n')
-		app_port = strings.TrimSpace(app_port)
+		// fmt.Print("Which port will this project use? (already used ports: " + ports + "): ")
+		// app_port, _ := reader.ReadString('\n')
+		// app_port = strings.TrimSpace(app_port)
 
 		fmt.Print("What is the domain of the project: ")
 		domain, _ := reader.ReadString('\n')
 		domain = strings.TrimSpace(domain)
 
-		fmt.Println("Creating app ", name, " with ports ", app_port, " and postgres ", use_pg, " on domain ", domain)
+		// fmt.Println("Creating app ", name, " with ports ", app_port, " and postgres ", use_pg, " on domain ", domain)
+		fmt.Println("Creating app ", name, " and postgres ", use_pg, " on domain ", domain)
 
 		fmt.Print("Is this correct? (y/n): ")
 		correct, _ := reader.ReadString('\n')
@@ -93,23 +94,23 @@ func main() {
 				break
 			}
 
-			fmt.Println("Setting ports")
-			setPortsHttp := exec.Command("dokku", "ports:set", name, "http:80:", app_port)
-			setPortsHttp .Stdout = &buffer
-			err = setPortsHttp.Run()
-			fmt.Println(buffer.String())
-			if err != nil {
-				fmt.Printf("Error setting ports http: %v\n", err)
-				break
-			}
-			setPortsHttps := exec.Command("dokku", "ports:set", name, "https:433:", app_port)
-			setPortsHttps.Stdout = &buffer
-			err = setPortsHttps.Run()
-			fmt.Println(buffer.String())
-			if err != nil {
-				fmt.Printf("Error setting ports https: %v\n", err)
-				break
-			}
+			// fmt.Println("Setting ports")
+			// setPortsHttp := exec.Command("dokku", "ports:set", name, "http:80:", app_port)
+			// setPortsHttp.Stdout = &buffer
+			// err = setPortsHttp.Run()
+			// fmt.Println(buffer.String())
+			// if err != nil {
+				// fmt.Printf("Error setting ports http: %v\n", err)
+				// break
+			// }
+			// setPortsHttps := exec.Command("dokku", "ports:set", name, "https:433:", app_port)
+			// setPortsHttps.Stdout = &buffer
+			// err = setPortsHttps.Run()
+			// fmt.Println(buffer.String())
+			// if err != nil {
+				// fmt.Printf("Error setting ports https: %v\n", err)
+				// break
+			// }
 
 			fmt.Println("All done!")
 			break
