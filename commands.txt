@@ -1,0 +1,13 @@
+dokku apps:create myapp
+
+dokku postgres:create myapp-db
+dokku postgres:link myapp-db myapp
+
+dokku ports:set myapp http:80:5000
+dokku ports:set myapp https:443:5000
+
+dokku domains:add myapp myapp.com
+
+dokku letsencrypt:set myapp email pedro.leoti.dev@gmail.com
+dokku letsencrypt:enable myapp
+
