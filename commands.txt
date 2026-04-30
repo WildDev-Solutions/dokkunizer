@@ -3,9 +3,16 @@ dokku apps:create myapp
 dokku postgres:create myapp-db
 dokku postgres:link myapp-db myapp
 
-dokku ports:set myapp http:80:5000
-dokku ports:set myapp https:443:5000
 
+dokku domains:report myapp
+# If there is random fucking domain in this list, remove it with the command below
+dokku domains:remove myapp random_fucking_domain
+
+dokku domains:add myapp myapp.com
 dokku letsencrypt:set myapp email pedro.leoti.dev@gmail.com
 dokku letsencrypt:enable myapp
-dokku domains:add myapp myapp.com
+
+
+# Almost never necessary
+dokku ports:set myapp http:80:5000
+dokku ports:set myapp https:443:5000
